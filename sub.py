@@ -5,6 +5,8 @@ from email.mime.text import MIMEText
 from time import strftime
 import pymysql
 
+import time
+
 from tensorflow.keras.models import load_model
 
 # Load your animal classification model
@@ -77,7 +79,14 @@ def main_code():
         
         print(animal_prediction)
         if animal_prediction != 'Other Animal':
+          
+
+            print("Alert!!! Animal Detected........ ",animal_prediction)
+
+            
+            
             cv2.putText(frame, animal_prediction, org, font, fontScale, color, thickness, cv2.LINE_AA)
+            time.sleep(10)
             send_notification()
 
         cv2.imshow("Animal Detection", frame)
