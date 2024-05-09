@@ -5,6 +5,8 @@ from email.mime.text import MIMEText
 from time import strftime
 import pymysql
 
+
+import winsound
 import time
 
 from tensorflow.keras.models import load_model
@@ -34,28 +36,28 @@ def predict_animal(image):
     predicted_class = class_labels[np.argmax(prediction)]
     return predicted_class
 
-def send_notification():
+def send_notification(animal_prediction):
     try:
-        qry = "SELECT `email` FROM `forest_app_officer_table`"
-        con = pymysql.connect(host='localhost', port=3308, user='root', password='12345678', db='forestfiredetection')
-        cmd = con.cursor()
-        cmd.execute(qry)
-        recipients = cmd.fetchall()
+        # qry = "SELECT `email` FROM `forest_app_officer_table`"
+        # con = pymysql.connect(host='localhost', port=3308, user='root', password='12345678', db='forestfiredetection')
+        # cmd = con.cursor()
+        # cmd.execute(qry)
+        # recipients = cmd.fetchall()
         
-        for recipient in recipients:
+        for recipient in [["recipients"]]:
             recipient_email = recipient[0]
             try:
                 gmail = smtplib.SMTP('smtp.gmail.com', 587)
                 gmail.ehlo()
                 gmail.starttls()
-                gmail.login('your_email@gmail.com', 'your_password')
+                gmail.login('anushkacet@gmail.com', 'vyyrwxtdxwugvtqg')
             except Exception as e:
                 print("Couldn't setup email!!" + str(e))
-            
-            msg = MIMEText("Animal Detected on camera no 4")
+                print("Animal Detected on camera no 4"+animal_prediction)
+            msg = MIMEText("Animal Detected on camera no 4"+animal_prediction)
             msg['Subject'] = 'Animal Detected'
-            msg['To'] = recipient_email
-            msg['From'] = 'your_email@gmail.com'
+            msg['To'] = 'sarikaksstrcs@gmail.com'
+            msg['From'] = 'anushkacet@gmail.com'
 
             try:
                 gmail.send_message(msg)
@@ -86,8 +88,14 @@ def main_code():
             
             
             cv2.putText(frame, animal_prediction, org, font, fontScale, color, thickness, cv2.LINE_AA)
+            
+            freq = 2500
+            dur = 2000
+
+            send_notification(animal_prediction)
+            winsound.Beep(freq,dur)
             time.sleep(10)
-            send_notification()
+            
 
         cv2.imshow("Animal Detection", frame)
         if cv2.waitKey(10) == 27:
